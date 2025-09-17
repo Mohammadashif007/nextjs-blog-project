@@ -3,18 +3,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-
+import { deleteBlog } from "@/actions";
 
 export default async function BlogDetailsPage({
     params,
 }: {
     params: Promise<{ id: string }>;
 }) {
-    const { id } = await params;
+    // const { id } = await params;
+    const id = parseInt((await params).id);
 
-    const blog = await prisma.posts.findUnique({ where: { id: Number(id) } });
+    const blog = await prisma.posts.findUnique({ where: { id } });
 
-    if(!blog) return <p>Blog not found</p>
+    const handleBlogDelete = deleteBlog.bind(null, id);
+
+    if (!blog) return <p>Blog not found</p>;
 
     return (
         <main className="min-h-screen bg-gradient-to-r from-indigo-400 to-purple-500 py-10 flex justify-center items-start">
@@ -42,12 +45,11 @@ export default async function BlogDetailsPage({
                                 Edit
                             </Button>
 
-                            <Button
-                                className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                                // For now, just console.log; later connect to delete API
-                            >
-                                Delete
-                            </Button>
+                            <form action={handleBlogDelete}>
+                                <Button className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                                    Delete
+                                </Button>
+                            </form>
                         </div>
                     </CardContent>
                 </Card>
